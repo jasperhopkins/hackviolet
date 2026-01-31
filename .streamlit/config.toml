@@ -1,7 +1,7 @@
 [theme]
 base="light"
 primaryColor="#564592"
-backgroundColor="#724cf9"
+backgroundColor="#564592"
 secondaryBackgroundColor="#E3DACC"
 textColor="#3D3A2A"
 linkColor = "#EDF67D"
