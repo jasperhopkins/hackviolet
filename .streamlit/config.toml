@@ -1,0 +1,11 @@
+[theme]
+base="light"
+primaryColor="#564592"
+backgroundColor="#724cf9"
+secondaryBackgroundColor="#E3DACC"
+textColor="#3D3A2A"
+linkColor = "#EDF67D"
+linkUnderline = false
+codeBackgroundColor = "#ecebe4"
+font="sans serif"
+baseRadius = "3rem"
