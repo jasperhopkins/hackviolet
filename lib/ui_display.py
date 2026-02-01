@@ -44,7 +44,7 @@ class AgentUIDisplay:
         """Set up Streamlit containers for agent display."""
 
         # Main container
-        with st.expander("🤖 Agent Activity", expanded=True):
+        with st.expander("🤖 Agent Activity", expanded=False):
             # Progress tracking
             col1, col2, col3 = st.columns([2, 1, 1])
             with col1:
