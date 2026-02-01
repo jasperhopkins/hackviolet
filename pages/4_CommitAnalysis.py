@@ -217,8 +217,12 @@ def main():
             "Git Repository URL",
             value=st.session_state.repo_url,
             placeholder="https://github.com/user/repo.git or git@github.com:user/repo.git",
-            help="Enter a public repository URL (HTTPS or SSH)"
+            help="Enter a public repository URL (HTTPS or SSH) - synced across pages",
+            key="commit_analysis_repo_url"
         )
+        # Update session state when changed
+        if repo_url != st.session_state.repo_url:
+            st.session_state.repo_url = repo_url
     
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)  # Spacing

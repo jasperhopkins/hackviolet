@@ -287,13 +287,70 @@ def main():
     st.title("👥 Contributor Profile Analytics")
     st.markdown("Analyze individual contributors by evaluating all their commits")
 
+    # Initialize session state
+    if 'repo_url' not in st.session_state:
+        st.session_state.repo_url = ""
+    if 'total_commits' not in st.session_state:
+        st.session_state.total_commits = 0
+
+    # Repository input section
+    st.subheader("📦 Repository")
+
+    col1, col2 = st.columns([3, 1])
+
+    with col1:
+        repo_url = st.text_input(
+            "Git Repository URL",
+            value=st.session_state.repo_url,
+            placeholder="https://github.com/user/repo.git or git@github.com:user/repo.git",
+            help="Enter a public repository URL (HTTPS or SSH) - synced across pages",
+            key="contributor_repo_url"
+        )
+        # Update session state when changed
+        if repo_url != st.session_state.repo_url:
+            st.session_state.repo_url = repo_url
+
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+        clone_clicked = st.button("🔄 Clone Repository", type="primary", use_container_width=True)
+
+    # Clone button logic
+    if clone_clicked:
+        if not repo_url:
+            st.error("Please enter a repository URL")
+        else:
+            try:
+                from lib.git_handler import GitHandler
+
+                with st.spinner("Cloning repository..."):
+                    # Create new handler
+                    handler = GitHandler()
+                    handler.clone_repository(repo_url)
+
+                    # Store in session state
+                    st.session_state.git_handler = handler
+                    st.session_state.repo_url = repo_url
+                    st.session_state.total_commits = handler.get_total_commits()
+
+                st.success(f"✓ Cloned successfully! Total commits: {st.session_state.total_commits}")
+                st.rerun()
+
+            except Exception as e:
+                st.error(f"Failed to clone repository: {str(e)}")
+
+    st.divider()
+
     # Check if git handler is available
     if 'git_handler' not in st.session_state or st.session_state.git_handler is None:
-        st.warning("⚠️ No repository loaded. Please load a repository first.")
+        st.warning("⚠️ No repository loaded. Please clone a repository above or use the Commit Analysis page.")
         st.page_link("pages/4_CommitAnalysis.py", label="Go to Commit Analysis", icon="🔍")
         return
 
     git_handler = st.session_state.git_handler
+
+    # Display repository info if cloned
+    if st.session_state.total_commits > 0:
+        st.info(f"📊 Repository: **{st.session_state.repo_url}** • Total commits: **{st.session_state.total_commits}**")
 
     st.divider()
 
@@ -303,6 +360,13 @@ def main():
             contributors = git_handler.get_all_contributors()
     except Exception as e:
         st.error(f"Error loading contributors: {e}")
+
+        # If repository is invalid, offer to re-clone
+        if "no longer exists" in str(e).lower() or "does not exist" in str(e).lower():
+            st.warning("The repository needs to be re-cloned. Please clone it again using the form above.")
+            # Clear the invalid handler
+            st.session_state.git_handler = None
+
         return
 
     if not contributors:

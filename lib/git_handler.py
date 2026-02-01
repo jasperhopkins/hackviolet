@@ -59,19 +59,23 @@ class GitHandler:
     def extract_commit_metadata(self, skip: int = 0, limit: int = 5) -> List[CommitMetadata]:
         """
         Extract metadata for commits with pagination.
-        
+
         Args:
             skip: Number of commits to skip
             limit: Maximum number of commits to return
-            
+
         Returns:
             List of CommitMetadata objects
         """
         if not self.repo:
             raise Exception("Repository not cloned. Call clone_repository() first.")
-        
+
+        # Validate repository still exists
+        if not self.temp_dir or not os.path.exists(self.temp_dir):
+            raise Exception("Repository directory no longer exists. Please clone the repository again.")
+
         commits = []
-        
+
         try:
             # Iterate through commits with skip and limit
             for i, commit in enumerate(self.repo.iter_commits()):
@@ -192,23 +196,30 @@ class GitHandler:
         if not self.repo:
             raise Exception("Repository not cloned. Call clone_repository() first.")
 
-        contributors = {}
+        # Validate repository still exists
+        if not self.temp_dir or not os.path.exists(self.temp_dir):
+            raise Exception("Repository directory no longer exists. Please clone the repository again.")
 
-        for commit in self.repo.iter_commits():
-            author_key = (commit.author.name, commit.author.email)
-            if author_key not in contributors:
-                contributors[author_key] = {
-                    'name': commit.author.name,
-                    'email': commit.author.email,
-                    'commit_count': 0
-                }
-            contributors[author_key]['commit_count'] += 1
+        try:
+            contributors = {}
 
-        # Convert to list and sort by commit count
-        contributor_list = list(contributors.values())
-        contributor_list.sort(key=lambda x: x['commit_count'], reverse=True)
+            for commit in self.repo.iter_commits():
+                author_key = (commit.author.name, commit.author.email)
+                if author_key not in contributors:
+                    contributors[author_key] = {
+                        'name': commit.author.name,
+                        'email': commit.author.email,
+                        'commit_count': 0
+                    }
+                contributors[author_key]['commit_count'] += 1
 
-        return contributor_list
+            # Convert to list and sort by commit count
+            contributor_list = list(contributors.values())
+            contributor_list.sort(key=lambda x: x['commit_count'], reverse=True)
+
+            return contributor_list
+        except Exception as e:
+            raise Exception(f"Failed to get contributors. Repository may be invalid. Please re-clone. Error: {str(e)}")
 
     def extract_commits_by_author(self, author_name: str, author_email: str) -> List[CommitMetadata]:
         """
@@ -223,6 +234,10 @@ class GitHandler:
         """
         if not self.repo:
             raise Exception("Repository not cloned. Call clone_repository() first.")
+
+        # Validate repository still exists
+        if not self.temp_dir or not os.path.exists(self.temp_dir):
+            raise Exception("Repository directory no longer exists. Please clone the repository again.")
 
         commits = []
 
