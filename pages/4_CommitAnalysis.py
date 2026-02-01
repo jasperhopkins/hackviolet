@@ -41,7 +41,7 @@ with c2:
     if st.button("🎥 Demo", use_container_width=True):
         st.switch_page("pages/2_DemoVideo.py")
 with c3:
-    if st.button("🔍 CodeOrigin", use_container_width=True):
+    if st.button("🔍 Commits", use_container_width=True):
         st.switch_page("pages/4_CommitAnalysis.py")
 with c4:
     if st.button("👥 Contributors", use_container_width=True):
