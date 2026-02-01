@@ -14,7 +14,8 @@ from datetime import datetime
 st.set_page_config(
     page_title="Contributor Profiles • CodeOrigin",
     page_icon="👥",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
 # ===================== NAV =====================

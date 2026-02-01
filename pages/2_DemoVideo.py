@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Demo • CodeOrigin", page_icon="🎥", layout="wide")
+st.set_page_config(page_title="Demo • CodeOrigin", page_icon="🎥", layout="wide", initial_sidebar_state="collapsed")
 
 # ===================== NAV =====================
 st.markdown("""
