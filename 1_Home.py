@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(page_title="CodeOrigin", page_icon="🏠", layout="wide")
 
-# ===================== NAV (buttons + switch_page) =====================
+# ===================== NAV =====================
 st.markdown("""
 <style>
 .nav-wrap { display:flex; justify-content:center; gap:14px; margin:18px 0 24px; }
@@ -20,6 +20,7 @@ st.markdown("""
 .nav-wrap .stButton>button:hover{
   background:rgba(255,255,255,0.18);
   transform:translateY(-2px);
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -42,35 +43,35 @@ st.markdown('</div>', unsafe_allow_html=True)
 # ===================== PAGE STYLES =====================
 st.markdown("""
 <style>
-body { background:#564592; color:#F2F0FA; }
+[data-testid="stAppViewContainer"] {
+  background:#564592;
+  color:#F2F0FA;
+}
 
 .hero{
-  position:relative;
   width:100%;
-  max-width:1100px;
-  height:300px;
+  max-width:1000px;
   margin:0 auto 40px;
   border-radius:20px;
   background:#A882DD;
   display:flex;
-  align-items:center;
   justify-content:center;
-  flex-direction:column;
-  text-align:center;
   box-shadow:0 6px 20px rgba(0,0,0,.35);
+  padding:28px 20px;
+}
+
+.hero-inner{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
 .hero img{
-  width:300px;
-  margin:0;
+  width:800px;
+  max-width:100%;
   filter:drop-shadow(0 10px 28px rgba(0,0,0,.55));
 }
 
-.hero p{
-  font-size:20px;
-  color:#E6E3F5;
-  font-style:italic;
-}
 
 .info-row{
   display:flex;
@@ -81,12 +82,12 @@ body { background:#564592; color:#F2F0FA; }
 }
 
 .info-box{
-  width:260px;
+  width:400px;
   background:rgba(255,255,255,0.12);
   color:#FFFFFF;
   border-radius:18px;
   box-shadow:0 4px 10px rgba(0,0,0,.25);
-  padding:18px;
+  padding:30px;
   text-align:center;
   transition:.2s ease;
 }
@@ -112,7 +113,9 @@ body { background:#564592; color:#F2F0FA; }
 # ===================== HERO =====================
 st.markdown("""
 <div class="hero">
-  <img src="https://raw.githubusercontent.com/jasperhopkins/hackviolet/refs/heads/main/CodeOriginLogo.png" style="width:850px;">
+  <div class="hero-inner">
+    <img src="https://raw.githubusercontent.com/jasperhopkins/hackviolet/refs/heads/main/CodeOriginLogo.png">
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
