@@ -57,6 +57,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from lib.git_handler import GitHandler
 from lib.ai_evaluator import AIEvaluator
+from lib.agentic_evaluator import AgenticEvaluator
+from lib.ui_display import AgentUIDisplay
 from lib.schemas import CommitEvaluation
 
 # Page config
@@ -75,9 +77,11 @@ if 'total_commits' not in st.session_state:
     st.session_state.total_commits = 0
 if 'api_key' not in st.session_state:
     st.session_state.api_key = None
+if 'use_agentic_mode' not in st.session_state:
+    st.session_state.use_agentic_mode = True
 
 
-def analyze_commits(handler: GitHandler, offset: int, limit: int, api_key: str):
+def analyze_commits(handler: GitHandler, offset: int, limit: int, api_key: str, use_agentic: bool = True):
     """
     Analyze a batch of commits.
     
@@ -90,40 +94,65 @@ def analyze_commits(handler: GitHandler, offset: int, limit: int, api_key: str):
     try:
         # Extract commit metadata
         commits = handler.extract_commit_metadata(skip=offset, limit=limit)
-        
+
         if not commits:
             st.warning("No more commits to analyze.")
             return
-        
-        # Create AI evaluator
-        evaluator = AIEvaluator(api_key)
-        
+
+        # Create appropriate evaluator
+        if use_agentic:
+            evaluator = AgenticEvaluator(api_key, handler)
+            st.info("🤖 Using Agentic Mode - AI agent will gather additional context using tools")
+        else:
+            evaluator = AIEvaluator(api_key)
+            st.info("📝 Using Standard Mode - Direct evaluation without tool use")
+
         # Progress bar
         progress_bar = st.progress(0)
-        status_text = st.empty()
-        
+
         # Analyze each commit
         for i, commit in enumerate(commits):
-            status_text.text(f"Analyzing commit {i+1}/{len(commits)}: {commit.hash[:8]}...")
-            
+            st.markdown(f"### Analyzing commit {i+1}/{len(commits)}: `{commit.hash[:8]}`")
+            st.caption(f"**{commit.author}** • {commit.message[:80]}")
+
             # Get diff
             diff = handler.get_commit_diff(commit.hash)
-            
-            # Evaluate with AI
-            evaluation = evaluator.evaluate_commit(commit, diff)
-            
+
+            if use_agentic:
+                # Agentic evaluation with UI display
+                ui_display = AgentUIDisplay()
+                ui_display.initialize()
+
+                # Create callback for UI updates
+                def ui_callback(event):
+                    ui_display.update(event)
+
+                # Evaluate with agent
+                evaluation = evaluator.evaluate_commit(commit, diff, ui_callback=ui_callback)
+
+                # Show usage summary
+                if hasattr(evaluator, 'tool_executor'):
+                    usage = evaluator.tool_executor.get_usage_summary()
+                    with st.expander("📊 Tool Usage Summary", expanded=False):
+                        ui_display.show_usage_summary(usage)
+            else:
+                # Standard evaluation
+                with st.spinner("Evaluating commit..."):
+                    evaluation = evaluator.evaluate_commit(commit, diff)
+
             # Add to session state
             st.session_state.evaluated_commits.append(evaluation)
-            
+
             # Update progress
             progress_bar.progress((i + 1) / len(commits))
-        
-        # Clear progress indicators
+
+            st.divider()
+
+        # Clear progress indicator
         progress_bar.empty()
-        status_text.empty()
-        
+
         st.success(f"✓ Successfully analyzed {len(commits)} commits!")
-        
+
     except Exception as e:
         st.error(f"Error analyzing commits: {str(e)}")
 
@@ -184,11 +213,11 @@ def display_commit_card(evaluation: CommitEvaluation):
 
 def main():
     """Main Streamlit app."""
-    
+
     # Header
     st.title("🔍 Git Commit Attribution Analyzer")
     st.markdown("AI-powered analysis of code contributions using Claude Sonnet 4.5")
-    
+
     # Get API key from secrets or user input
     api_key = None
     if 'ANTHROPIC_API_KEY' in st.secrets:
@@ -204,9 +233,31 @@ def main():
     if not api_key:
         st.info("👆 Please provide an Anthropic API key to continue.")
         return
-    
+
     st.divider()
-    
+
+    # Agentic Mode Toggle (Main Page)
+    st.subheader("🤖 Analysis Mode")
+    col1, col2 = st.columns([1, 3])
+
+    with col1:
+        use_agentic = st.toggle(
+            "Enable Agentic Mode",
+            value=st.session_state.use_agentic_mode,
+            help="When enabled, AI agent will use tools to gather additional context before evaluation"
+        )
+        st.session_state.use_agentic_mode = use_agentic
+
+    with col2:
+        if use_agentic:
+            st.success("🤖 Agentic Mode: AI will use tools for context gathering")
+            st.caption("The agent can read files, search history, and explore the codebase to improve evaluation accuracy.")
+        else:
+            st.info("📝 Standard Mode: Direct evaluation without tools")
+            st.caption("Faster but with less context about the codebase.")
+
+    st.divider()
+
     # Repository input section
     st.subheader("📦 Repository")
     
@@ -253,7 +304,7 @@ def main():
                 
                 # Automatically analyze first 5 commits
                 with st.spinner("Analyzing first 5 commits..."):
-                    analyze_commits(handler, 0, 5, api_key)
+                    analyze_commits(handler, 0, 5, api_key, use_agentic=st.session_state.use_agentic_mode)
                 
                 st.rerun()
                     
@@ -288,7 +339,8 @@ def main():
                         st.session_state.git_handler,
                         st.session_state.current_offset,
                         next_batch,
-                        api_key
+                        api_key,
+                        use_agentic=st.session_state.use_agentic_mode
                     )
                 st.rerun()
         else:

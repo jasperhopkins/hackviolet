@@ -63,6 +63,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from lib.contributor_aggregator import ContributorAggregator
 from lib.schemas import ContributorProfile, TimeBasedMetrics
 from lib.ai_evaluator import AIEvaluator
+from lib.agentic_evaluator import AgenticEvaluator
+from lib.ui_display import AgentUIDisplay
 
 
 def plot_impact_distribution(metrics: TimeBasedMetrics, title: str):
@@ -292,6 +294,30 @@ def main():
         st.session_state.repo_url = ""
     if 'total_commits' not in st.session_state:
         st.session_state.total_commits = 0
+    if 'use_agentic_mode' not in st.session_state:
+        st.session_state.use_agentic_mode = True
+
+    # Agentic Mode Toggle (Main Page)
+    st.subheader("🤖 Analysis Mode")
+    col1, col2 = st.columns([1, 3])
+
+    with col1:
+        use_agentic = st.toggle(
+            "Enable Agentic Mode",
+            value=st.session_state.use_agentic_mode,
+            help="When enabled, AI agent will use tools to gather additional context before evaluation"
+        )
+        st.session_state.use_agentic_mode = use_agentic
+
+    with col2:
+        if use_agentic:
+            st.success("🤖 Agentic Mode: AI will use tools for context gathering")
+            st.caption("The agent can read files, search history, and explore the codebase to improve evaluation accuracy.")
+        else:
+            st.info("📝 Standard Mode: Direct evaluation without tools")
+            st.caption("Faster but with less context about the codebase.")
+
+    st.divider()
 
     # Repository input section
     st.subheader("📦 Repository")
@@ -434,33 +460,58 @@ def main():
                     st.warning("No commits found for this contributor.")
                     return
 
-                st.info(f"Found {len(commits)} commits. Starting AI evaluation...")
+                # Create appropriate evaluator
+                if st.session_state.use_agentic_mode:
+                    st.info(f"🤖 Found {len(commits)} commits. Starting Agentic AI evaluation with context gathering...")
+                    evaluator = AgenticEvaluator(st.session_state.api_key, git_handler)
+                else:
+                    st.info(f"📝 Found {len(commits)} commits. Starting Standard AI evaluation...")
+                    evaluator = AIEvaluator(st.session_state.api_key)
 
-                # Initialize AI evaluator
-                evaluator = AIEvaluator(st.session_state.api_key)
                 evaluations = []
 
                 # Progress bar
                 progress_bar = st.progress(0)
-                status_text = st.empty()
 
                 # Evaluate each commit
                 for i, commit in enumerate(commits):
-                    status_text.text(f"Evaluating commit {i+1}/{len(commits)}: {commit.hash[:8]}")
+                    st.markdown(f"#### Commit {i+1}/{len(commits)}: `{commit.hash[:8]}`")
+                    st.caption(f"**{commit.author}** • {commit.message[:80]}")
 
                     # Get diff
                     diff = git_handler.get_commit_diff(commit.hash)
 
-                    # Evaluate
-                    evaluation = evaluator.evaluate_commit(commit, diff)
+                    if st.session_state.use_agentic_mode:
+                        # Agentic evaluation with UI display
+                        ui_display = AgentUIDisplay()
+                        ui_display.initialize()
+
+                        # Create callback for UI updates
+                        def ui_callback(event):
+                            ui_display.update(event)
+
+                        # Evaluate with agent
+                        evaluation = evaluator.evaluate_commit(commit, diff, ui_callback=ui_callback)
+
+                        # Show usage summary
+                        if hasattr(evaluator, 'tool_executor'):
+                            usage = evaluator.tool_executor.get_usage_summary()
+                            with st.expander("📊 Tool Usage Summary", expanded=False):
+                                ui_display.show_usage_summary(usage)
+                    else:
+                        # Standard evaluation
+                        with st.spinner("Evaluating commit..."):
+                            evaluation = evaluator.evaluate_commit(commit, diff)
+
                     evaluations.append(evaluation)
 
                     # Update progress
                     progress_bar.progress((i + 1) / len(commits))
 
-                # Clear progress indicators
+                    st.divider()
+
+                # Clear progress indicator
                 progress_bar.empty()
-                status_text.empty()
 
                 # Store in session state
                 st.session_state.contributor_evaluations[contributor_key] = evaluations
