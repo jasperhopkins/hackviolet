@@ -25,11 +25,11 @@ with c2:
     if st.button("🎥 Demo", use_container_width=True):
         st.switch_page("pages/2_DemoVideo.py")
 with c3:
-    if st.button("🔍 CodeOrigin", use_container_width=True):
-        st.switch_page("pages/3_CodeOrigin.py")
-with c4:
     if st.button("👥 About Us", use_container_width=True):
-        st.switch_page("pages/4_Info.py")
+        st.switch_page("pages/3_Info.py")
+with c4:
+    if st.button("🔍 CodeOrigin", use_container_width=True):
+        st.switch_page("pages/4_CommitAnalysis.py")
 with c5:
     if st.button("⚙ Repository Link", use_container_width=True):
         st.switch_page("pages/5_RepoLink.py")

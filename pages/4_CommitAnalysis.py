@@ -245,10 +245,6 @@ def main():
         st.info("👆 Click 'Clone & Analyze' to start analyzing commits")
     else:
         st.info("👆 Enter a repository URL and click 'Clone & Analyze' to get started")
-    
-    # Footer
-    st.divider()
-    st.caption("Built with ❤️ using Streamlit and Claude Sonnet 4.5 • Part of CodeOrigin")
 
 
 if __name__ == "__main__":
