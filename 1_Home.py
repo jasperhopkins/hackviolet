@@ -7,12 +7,19 @@ st.markdown("""
 <style>
 .nav-wrap { display:flex; justify-content:center; gap:14px; margin:18px 0 24px; }
 .nav-wrap .stButton>button{
-  border:0; border-radius:18px;
-  padding:10px 22px; font-weight:700; font-size:16px;
+  background:rgba(255,255,255,0.12);
+  color:#FFFFFF;
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:18px;
+  padding:10px 22px;
+  font-weight:700;
+  font-size:16px;
   box-shadow:0 3px 6px rgba(0,0,0,.15);
   transition:.15s ease;
 }
-.nav-wrap .stButton>button:hover{ background:#DCCFB7; transform:translateY(-2px); }
+.nav-wrap .stButton>button:hover{
+  background:rgba(255,255,255,0.18);
+  transform:translateY(-2px);
 </style>
 """, unsafe_allow_html=True)
 
@@ -32,28 +39,99 @@ with c4:
         st.switch_page("pages/3_Info.py")
 st.markdown('</div>', unsafe_allow_html=True)
 
+# ===================== PAGE STYLES =====================
 st.markdown("""
 <style>
-.hero-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    margin: 12px 0 28px;
+body { background:#564592; color:#F2F0FA; }
+
+.hero{
+  position:relative;
+  width:100%;
+  max-width:1100px;
+  height:300px;
+  margin:0 auto 40px;
+  border-radius:20px;
+  background:#A882DD;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
 }
 
-.logo-shadow img {
-    width: 340px;                
-    max-width: 90%;
-    filter: drop-shadow(0 10px 28px rgba(0,0,0,0.45))
-            drop-shadow(0 0 22px rgba(190,150,255,0.35)); 
+.hero img{
+  width:300px;
+  margin:0;
+  filter:drop-shadow(0 10px 28px rgba(0,0,0,.55));
 }
 
+.hero p{
+  font-size:20px;
+  color:#E6E3F5;
+  font-style:italic;
+}
+
+.info-row{
+  display:flex;
+  justify-content:center;
+  gap:22px;
+  flex-wrap:wrap;
+  margin-top:40px;
+}
+
+.info-box{
+  width:260px;
+  background:rgba(255,255,255,0.12);
+  color:#FFFFFF;
+  border-radius:18px;
+  box-shadow:0 4px 10px rgba(0,0,0,.25);
+  padding:18px;
+  text-align:center;
+  transition:.2s ease;
+}
+
+.info-box:hover{
+  background:rgba(255,255,255,0.18);
+  transform:translateY(-3px);
+}
+
+.info-box h3{
+  margin-bottom:8px;
+  color:#FFFFFF;
+}
+
+.info-box p{
+  margin:0;
+  font-size:.95rem;
+  color:#E6E3F5;
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="logo-shadow">', unsafe_allow_html=True)
-st.image("CodeOriginLogo.png", use_container_width=False)
-st.markdown('</div>', unsafe_allow_html=True)
+# ===================== HERO =====================
+st.markdown("""
+<div class="hero">
+  <img src="https://raw.githubusercontent.com/jasperhopkins/hackviolet/refs/heads/main/CodeOriginLogo.png" style="width:850px;">
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)
+# ===================== INFO BOXES =====================
+st.markdown("""
+<div class="info-row">
+  <div class="info-box">
+    <h3>🔎 Commit Analysis</h3>
+    <p>Who changed what, when, and where.</p>
+  </div>
+
+  <div class="info-box">
+    <h3>🧬 Style Drift</h3>
+    <p>Spot sudden authorship shifts.</p>
+  </div>
+
+  <div class="info-box">
+    <h3>🤖 AI Insights</h3>
+    <p>LLM-powered explanations.</p>
+  </div>
+</div>
+""", unsafe_allow_html=True)
