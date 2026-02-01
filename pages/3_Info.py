@@ -44,10 +44,21 @@ with c5:
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("""
-<div style="max-width:1100px; margin:40px auto; text-align:center;">
-  <img 
+<div style="
+  max-width:1000px;
+  margin:10px auto;
+  padding:18px;
+  background:#A882DD;
+  border-radius:20px;
+  box-shadow:0 10px 28px rgba(0,0,0,.35);
+">
+  <img
     src="https://raw.githubusercontent.com/jasperhopkins/hackviolet/refs/heads/main/HowItWorks.png"
-    style="width:100%; border-radius:18px; box-shadow:0 6px 20px rgba(0,0,0,.35);"
+    style="
+      width:100%;
+      display:block;
+      border-radius:0px;
+    "
   >
 </div>
 """, unsafe_allow_html=True)
