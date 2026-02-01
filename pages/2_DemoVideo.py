@@ -44,7 +44,7 @@ with c5:
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.subheader("Demo Video")
-st.video("https://www.youtube.com/watch?v=-UGFq6jAlZg")
+st.video("https://youtu.be/6ioqGIbIa2Q")
 
 st.markdown("""
 <style>

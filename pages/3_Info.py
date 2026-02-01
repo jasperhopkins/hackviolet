@@ -42,3 +42,12 @@ with c5:
     if st.button("ℹ️ About Us", use_container_width=True):
         st.switch_page("pages/3_Info.py")
 st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div style="max-width:1100px; margin:40px auto; text-align:center;">
+  <img 
+    src="https://raw.githubusercontent.com/jasperhopkins/hackviolet/refs/heads/main/HowItWorks.png"
+    style="width:100%; border-radius:18px; box-shadow:0 6px 20px rgba(0,0,0,.35);"
+  >
+</div>
+""", unsafe_allow_html=True)
