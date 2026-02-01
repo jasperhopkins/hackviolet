@@ -1,9 +1,9 @@
 [theme]
-base="light"
+base="dark"
 primaryColor="#564592"
 backgroundColor="#564592"
-secondaryBackgroundColor="#E3DACC"
-textColor="#3D3A2A"
+secondaryBackgroundColor="#E1DEEF"
+textColor="#F2F0FA"
 linkColor = "#EDF67D"
 linkUnderline = false
 codeBackgroundColor = "#ecebe4"

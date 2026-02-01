@@ -7,8 +7,6 @@ st.markdown("""
 <style>
 .nav-wrap { display:flex; justify-content:center; gap:14px; margin:18px 0 24px; }
 .nav-wrap .stButton>button{
-  background:#E3DACC;            /* same as info boxes */
-  color:#3D3A2A;                  /* theme text */
   border:0; border-radius:18px;
   padding:10px 22px; font-weight:700; font-size:16px;
   box-shadow:0 3px 6px rgba(0,0,0,.15);
@@ -27,14 +25,38 @@ with c2:
     if st.button("🎥 Demo", use_container_width=True):
         st.switch_page("pages/2_DemoVideo.py")
 with c3:
-    if st.button("🔍 CodeOrgin", use_container_width=True):
+    if st.button("🔍 CodeOrigin", use_container_width=True):
         st.switch_page("pages/3_CodeOrigin.py")
 with c4:
     if st.button("👥 About Us", use_container_width=True):
         st.switch_page("pages/4_Info.py")
 with c5:
     if st.button("⚙ Repository Link", use_container_width=True):
-        st.switch_page("pages/4_RepoLink.py")
+        st.switch_page("pages/5_RepoLink.py")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ===================== PAGE STYLES =====================
+st.markdown("""
+<style>
+.hero-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 12px 0 28px;
+}
+
+.logo-shadow img {
+    width: 340px;                
+    max-width: 90%;
+    filter: drop-shadow(0 10px 28px rgba(0,0,0,0.45))
+            drop-shadow(0 0 22px rgba(190,150,255,0.35)); 
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="logo-shadow">', unsafe_allow_html=True)
+st.image("CodeOriginLogo.png", use_container_width=False)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
