@@ -182,16 +182,97 @@ class GitHandler:
         
         return self._total_commits
     
+    def get_all_contributors(self) -> List[dict]:
+        """
+        Get list of all unique contributors in the repository.
+
+        Returns:
+            List of dictionaries with 'name', 'email', and 'commit_count'
+        """
+        if not self.repo:
+            raise Exception("Repository not cloned. Call clone_repository() first.")
+
+        contributors = {}
+
+        for commit in self.repo.iter_commits():
+            author_key = (commit.author.name, commit.author.email)
+            if author_key not in contributors:
+                contributors[author_key] = {
+                    'name': commit.author.name,
+                    'email': commit.author.email,
+                    'commit_count': 0
+                }
+            contributors[author_key]['commit_count'] += 1
+
+        # Convert to list and sort by commit count
+        contributor_list = list(contributors.values())
+        contributor_list.sort(key=lambda x: x['commit_count'], reverse=True)
+
+        return contributor_list
+
+    def extract_commits_by_author(self, author_name: str, author_email: str) -> List[CommitMetadata]:
+        """
+        Extract metadata for all commits by a specific author.
+
+        Args:
+            author_name: Author's name
+            author_email: Author's email
+
+        Returns:
+            List of CommitMetadata objects for this author
+        """
+        if not self.repo:
+            raise Exception("Repository not cloned. Call clone_repository() first.")
+
+        commits = []
+
+        try:
+            for commit in self.repo.iter_commits():
+                # Check if commit is by this author
+                if commit.author.name == author_name and commit.author.email == author_email:
+                    # Extract file changes
+                    files_changed = []
+                    insertions = 0
+                    deletions = 0
+
+                    try:
+                        stats = commit.stats.files
+                        files_changed = list(stats.keys())
+                        insertions = commit.stats.total.get('insertions', 0)
+                        deletions = commit.stats.total.get('deletions', 0)
+                    except Exception:
+                        pass
+
+                    # Build metadata object
+                    metadata = CommitMetadata(
+                        hash=commit.hexsha,
+                        author=commit.author.name,
+                        email=commit.author.email,
+                        timestamp=commit.committed_datetime.isoformat(),
+                        message=commit.message.strip(),
+                        files_changed=files_changed,
+                        insertions=insertions,
+                        deletions=deletions,
+                        lines_changed=insertions + deletions
+                    )
+
+                    commits.append(metadata)
+
+        except Exception as e:
+            raise Exception(f"Failed to extract commits by author: {str(e)}")
+
+        return commits
+
     def get_repo_info(self) -> dict:
         """
         Get basic repository information.
-        
+
         Returns:
             Dictionary with repo info (branch, remote, etc.)
         """
         if not self.repo:
             raise Exception("Repository not cloned. Call clone_repository() first.")
-        
+
         try:
             return {
                 'active_branch': self.repo.active_branch.name,

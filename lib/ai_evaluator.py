@@ -182,6 +182,7 @@ Important: Return ONLY the JSON object, no additional text before or after."""
             evaluation = CommitEvaluation(
                 commit_hash=commit.hash,
                 author=commit.author,
+                email=commit.email,
                 timestamp=commit.timestamp,
                 message=commit.message,
                 technical_complexity=data.get('technical_complexity', 3),
@@ -229,6 +230,7 @@ Important: Return ONLY the JSON object, no additional text before or after."""
         return CommitEvaluation(
             commit_hash=commit.hash,
             author=commit.author,
+            email=commit.email,
             timestamp=commit.timestamp,
             message=commit.message,
             technical_complexity=3,

@@ -10,11 +10,12 @@ import sys
 
 st.set_page_config(page_title="Commit Analysis • CodeOrigin", page_icon="🔍", layout="wide")
 
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4, c5 = st.columns(5)
 with c1: st.page_link("1_Home.py", label="Home", icon="🏠")
 with c2: st.page_link("pages/2_DemoVideo.py", label="Demo", icon="🎥")
 with c3: st.page_link("pages/4_CommitAnalysis.py", label="CodeOrigin", icon="🔍")
-with c4: st.page_link("pages/3_Info.py", label="About Us", icon="👥")
+with c4: st.page_link("pages/5_ContributorProfiles.py", label="Contributors", icon="👥")
+with c5: st.page_link("pages/3_Info.py", label="About Us", icon="ℹ️")
 
 
 # Add lib to path
@@ -38,6 +39,8 @@ if 'repo_url' not in st.session_state:
     st.session_state.repo_url = ""
 if 'total_commits' not in st.session_state:
     st.session_state.total_commits = 0
+if 'api_key' not in st.session_state:
+    st.session_state.api_key = None
 
 
 def analyze_commits(handler: GitHandler, offset: int, limit: int, api_key: str):
@@ -156,10 +159,14 @@ def main():
     api_key = None
     if 'ANTHROPIC_API_KEY' in st.secrets:
         api_key = st.secrets['ANTHROPIC_API_KEY']
+        st.session_state.api_key = api_key
     else:
         st.warning("⚠️ No API key found in secrets. Please enter your Anthropic API key below.")
-        api_key = st.text_input("Anthropic API Key", type="password", help="Your API key will not be stored")
-    
+        api_key_input = st.text_input("Anthropic API Key", type="password", help="Enter your API key")
+        if api_key_input:
+            api_key = api_key_input
+            st.session_state.api_key = api_key
+
     if not api_key:
         st.info("👆 Please provide an Anthropic API key to continue.")
         return
@@ -188,32 +195,32 @@ def main():
         if not repo_url:
             st.error("Please enter a repository URL")
         else:
-            with st.spinner("Cloning repository..."):
-                try:
+            try:
+                with st.spinner("Cloning repository..."):
                     # Create new handler
                     handler = GitHandler()
                     handler.clone_repository(repo_url)
                     
                     # Store in session state
-                    st.session_state.git_handler = handler
-                    st.session_state.repo_url = repo_url
-                    st.session_state.current_offset = 0
-                    st.session_state.evaluated_commits = []
-                    st.session_state.total_commits = handler.get_total_commits()
+                st.session_state.git_handler = handler
+                st.session_state.repo_url = repo_url
+                st.session_state.current_offset = 0
+                st.session_state.evaluated_commits = []
+                st.session_state.total_commits = handler.get_total_commits()
+                
+                # Get repo info
+                repo_info = handler.get_repo_info()
+                
+                st.success(f"✓ Cloned successfully! Total commits: {st.session_state.total_commits}")
+                
+                # Automatically analyze first 5 commits
+                with st.spinner("Analyzing first 5 commits..."):
+                    analyze_commits(handler, 0, 5, api_key)
+                
+                st.rerun()
                     
-                    # Get repo info
-                    repo_info = handler.get_repo_info()
-                    
-                    st.success(f"✓ Cloned successfully! Total commits: {st.session_state.total_commits}")
-                    
-                    # Automatically analyze first 5 commits
-                    with st.spinner("Analyzing first 5 commits..."):
-                        analyze_commits(handler, 0, 5, api_key)
-                    
-                    st.rerun()
-                    
-                except Exception as e:
-                    st.error(f"Failed to clone repository: {str(e)}")
+            except Exception as e:
+                st.error(f"Failed to clone repository: {str(e)}")
     
     # Display repository info if cloned
     if st.session_state.git_handler and st.session_state.total_commits > 0:
