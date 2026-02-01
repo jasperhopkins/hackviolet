@@ -8,7 +8,7 @@ import streamlit as st
 import os
 import sys
 
-st.set_page_config(page_title="Commit Analysis • CodeOrigin", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Commit Analysis • CodeOrigin", page_icon="🔍", layout="wide", initial_sidebar_state="collapsed")
 
 # ===================== NAV =====================
 st.markdown("""
@@ -60,9 +60,6 @@ from lib.ai_evaluator import AIEvaluator
 from lib.agentic_evaluator import AgenticEvaluator
 from lib.ui_display import AgentUIDisplay
 from lib.schemas import CommitEvaluation
-
-# Page config
-st.set_page_config(page_title="Commit Analysis", page_icon="🔍", layout="wide")
 
 # Initialize session state
 if 'evaluated_commits' not in st.session_state:
