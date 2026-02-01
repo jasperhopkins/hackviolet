@@ -62,3 +62,23 @@ st.markdown("""
   >
 </div>
 """, unsafe_allow_html=True)
+
+st.markdown("""
+<div style="
+  max-width:1000px;
+  margin:30px auto;
+  padding:18px;
+  background:#A882DD;
+  border-radius:20px;
+  box-shadow:0 10px 28px rgba(0,0,0,.35);
+">
+  <img
+    src="https://raw.githubusercontent.com/jasperhopkins/hackviolet/refs/heads/main/OurMotivation.png"
+    style="
+      width:100%;
+      display:block;
+      border-radius:0px;
+    "
+  >
+</div>
+""", unsafe_allow_html=True)
